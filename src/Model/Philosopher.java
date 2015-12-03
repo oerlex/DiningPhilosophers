@@ -1,8 +1,12 @@
 package Model;
 
+
+import javafx.scene.paint.Color;
+import sample.Controller;
+import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by oerlex on 2015-11-27.
@@ -18,19 +22,26 @@ public class Philosopher implements Runnable{
     private State myState;
     private int id;
     private long stateTime;
-    private final int MAX_STATE_TIME = 1500;
+    private final int MAX_STATE_TIME = 5000;
     private Lock leftChopstick;
     private Lock rightChopstick;
     private double time_Thinking;
     private double time_Hungry;
     private double time_Eating;
-    private int temp;
+    private int counterEating;
+    private int counterThinking;
+    private int counterHungry;
+    private Date startHungry = new Date();
+    private Controller controller;
+    private StringBuilder stringBuilder;
 
-    public Philosopher(int id, Lock chopstickLeft, Lock chopstickRight){
+    public Philosopher(int id, Lock chopstickLeft, Lock chopstickRight, Controller c, StringBuilder sb){
         this.myState = State.thinking;
         this.id = id;
         this.leftChopstick = chopstickLeft;
         this.rightChopstick = chopstickRight;
+        this.controller = c;
+        this.stringBuilder = sb;
     }
 
     public void run(){
@@ -38,11 +49,12 @@ public class Philosopher implements Runnable{
             while (true) {
                 if(myState == State.hungry){
                     printState();
-                    if (leftChopstick.tryLock()) {
-                        System.out.println("Philosopher " + id + " is grabbing 1 chopstickchopstick.");
+                    if (leftChopstick.tryLock(2, TimeUnit.SECONDS)) {
+                        toString();
+                        stringBuilder.append("Philosopher " + id + " is grabbing 1 chopstickchopstick.\n");
                         try {
-                            if (rightChopstick.tryLock()) {
-                                System.out.println("Philosopher " + id + " is grabbing r chopstick.");
+                            if (rightChopstick.tryLock(2, TimeUnit.SECONDS)) {
+                                stringBuilder.append("Philosopher " + id + " is grabbing r chopstick.\n");
                                 try {
                                    eat();
                                 }
@@ -58,54 +70,92 @@ public class Philosopher implements Runnable{
                 }else{
                     think();
                 }
-                Thread.sleep(500);
             }
         } catch (InterruptedException e) {
-            System.out.println("Philosopher " + id + " was interrupted.\n");
+            stringBuilder.append("Philosopher " + id + " was interrupted.\n");
         }
     }
 
     private void think() throws InterruptedException {
+        counterThinking++;
         calculateStateTime();
+        switch(id){
+            case 1: controller.getCircle1().setFill(Color.RED);break;
+            case 2: controller.getCircle2().setFill(Color.RED);break;
+            case 3: controller.getCircle3().setFill(Color.RED);break;
+            case 4: controller.getCircle4().setFill(Color.RED);break;
+            case 5: controller.getCircle5().setFill(Color.RED);break;
+        }
         myState = State.thinking;
         printState();
         Thread.sleep(stateTime);
         time_Thinking+=stateTime;
+        hunger();
     }
 
     private void eat() throws InterruptedException {
+        counterEating++;
+        Date endHungry = new Date();
+        time_Hungry += endHungry.getTime()-startHungry.getTime();
         calculateStateTime();
         myState = State.eating;
+        switch(id){
+            case 1: controller.getCircle1().setFill(Color.GREEN);break;
+            case 2: controller.getCircle2().setFill(Color.GREEN);break;
+            case 3: controller.getCircle3().setFill(Color.GREEN);break;
+            case 4: controller.getCircle4().setFill(Color.GREEN);break;
+            case 5: controller.getCircle5().setFill(Color.GREEN);break;
+        }
         printState();
         Thread.sleep(stateTime);
         time_Eating+=stateTime;
     }
 
-    private void hungry() throws InterruptedException{
-        calculateStateTime();
+    private void hunger(){
+        counterHungry++;
+        switch(id){
+            case 1: controller.getCircle1().setFill(Color.YELLOW);break;
+            case 2: controller.getCircle2().setFill(Color.YELLOW);break;
+            case 3: controller.getCircle3().setFill(Color.YELLOW);break;
+            case 4: controller.getCircle4().setFill(Color.YELLOW);break;
+            case 5: controller.getCircle5().setFill(Color.YELLOW);break;
+        }
         myState = State.hungry;
-        printState();
-
+        startHungry.getTime();
     }
 
     private void putLeftChopStickOnTable(){
-        System.out.println("Philosopher " + id + " is putting  l chopstick down.");
+        stringBuilder.append("Philosopher " + id + " is putting  l chopstick down.\n");
         leftChopstick.unlock();
     }
 
     private void putRightChopStickOnTable(){
-        System.out.println("Philosopher " + id + " is putting  r chopstick down.");
+        stringBuilder.append("Philosopher " + id + " is putting  r chopstick down.\n");
         rightChopstick.unlock();
     }
 
     private void calculateStateTime(){
         Random r = new Random();
-        this.stateTime = (MAX_STATE_TIME-r.nextInt(30));
+        this.stateTime = (MAX_STATE_TIME-r.nextInt(3000));
+    }
+
+    public void printState(){
+        stringBuilder.append("Philosopher "+ id+" is "+myState+"\n");
     }
 
 
-    public void printState(){
-        System.out.println("Philosopher "+ id+" is "+myState);
+    public double getAverageThinking(){
+        return time_Thinking/counterThinking;
+    }
+    public double getAverageEating(){
+        return time_Eating/counterEating;
+    }
+    public double getAverageHungry(){
+        return time_Hungry/counterHungry;
+    }
+
+    public int getId() {
+        return id;
     }
 
 }
