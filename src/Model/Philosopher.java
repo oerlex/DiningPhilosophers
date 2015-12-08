@@ -49,11 +49,11 @@ public class Philosopher implements Runnable{
             while (true) {
                 if(myState == State.hungry){
                     printState();
-                    if (leftChopstick.tryLock(2, TimeUnit.SECONDS)) {
+                    if (leftChopstick.tryLock(1, TimeUnit.SECONDS)) {
                         toString();
                         stringBuilder.append("Philosopher " + id + " is grabbing 1 chopstickchopstick.\n");
                         try {
-                            if (rightChopstick.tryLock(2, TimeUnit.SECONDS)) {
+                            if (rightChopstick.tryLock(1, TimeUnit.SECONDS)) {
                                 stringBuilder.append("Philosopher " + id + " is grabbing r chopstick.\n");
                                 try {
                                    eat();
@@ -80,11 +80,26 @@ public class Philosopher implements Runnable{
         counterThinking++;
         calculateStateTime();
         switch(id){
-            case 1: controller.getCircle1().setFill(Color.RED);break;
-            case 2: controller.getCircle2().setFill(Color.RED);break;
-            case 3: controller.getCircle3().setFill(Color.RED);break;
-            case 4: controller.getCircle4().setFill(Color.RED);break;
-            case 5: controller.getCircle5().setFill(Color.RED);break;
+            case 0: controller.getCircle1().setFill(Color.RED);
+                    controller.getChopstick1().setFill(Color.WHITESMOKE);
+                    controller.getChopstick5().setFill(Color.WHITESMOKE);
+                    break;
+            case 1: controller.getCircle2().setFill(Color.RED);
+                    controller.getChopstick1().setFill(Color.WHITESMOKE);
+                    controller.getChopstick2().setFill(Color.WHITESMOKE);
+                    break;
+            case 2: controller.getCircle3().setFill(Color.RED);
+                    controller.getChopstick2().setFill(Color.WHITESMOKE);
+                    controller.getChopstick3().setFill(Color.WHITESMOKE);
+                    break;
+            case 3: controller.getCircle4().setFill(Color.RED);
+                    controller.getChopstick3().setFill(Color.WHITESMOKE);
+                    controller.getChopstick4().setFill(Color.WHITESMOKE);
+                    break;
+            case 4: controller.getCircle5().setFill(Color.RED);
+                    controller.getChopstick4().setFill(Color.WHITESMOKE);
+                    controller.getChopstick5().setFill(Color.WHITESMOKE);
+                    break;
         }
         myState = State.thinking;
         printState();
@@ -100,11 +115,26 @@ public class Philosopher implements Runnable{
         calculateStateTime();
         myState = State.eating;
         switch(id){
-            case 1: controller.getCircle1().setFill(Color.GREEN);break;
-            case 2: controller.getCircle2().setFill(Color.GREEN);break;
-            case 3: controller.getCircle3().setFill(Color.GREEN);break;
-            case 4: controller.getCircle4().setFill(Color.GREEN);break;
-            case 5: controller.getCircle5().setFill(Color.GREEN);break;
+            case 0: controller.getCircle1().setFill(Color.GREEN);
+                    controller.getChopstick1().setFill(Color.PURPLE);
+                    controller.getChopstick5().setFill(Color.PURPLE);
+                    ;break;
+            case 1: controller.getCircle2().setFill(Color.GREEN);
+                    controller.getChopstick1().setFill(Color.PURPLE);
+                    controller.getChopstick2().setFill(Color.PURPLE);
+                    ;break;
+            case 2: controller.getCircle3().setFill(Color.GREEN);
+                    controller.getChopstick2().setFill(Color.PURPLE);
+                    controller.getChopstick3().setFill(Color.PURPLE);
+                    ;break;
+            case 3: controller.getCircle4().setFill(Color.GREEN);
+                    controller.getChopstick3().setFill(Color.PURPLE);
+                    controller.getChopstick4().setFill(Color.PURPLE);
+                    ;break;
+            case 4: controller.getCircle5().setFill(Color.GREEN);
+                    controller.getChopstick4().setFill(Color.PURPLE);
+                    controller.getChopstick5().setFill(Color.PURPLE);
+                    ;break;
         }
         printState();
         Thread.sleep(stateTime);
@@ -114,11 +144,11 @@ public class Philosopher implements Runnable{
     private void hunger(){
         counterHungry++;
         switch(id){
-            case 1: controller.getCircle1().setFill(Color.YELLOW);break;
-            case 2: controller.getCircle2().setFill(Color.YELLOW);break;
-            case 3: controller.getCircle3().setFill(Color.YELLOW);break;
-            case 4: controller.getCircle4().setFill(Color.YELLOW);break;
-            case 5: controller.getCircle5().setFill(Color.YELLOW);break;
+            case 0: controller.getCircle1().setFill(Color.YELLOW);break;
+            case 1: controller.getCircle2().setFill(Color.YELLOW);break;
+            case 2: controller.getCircle3().setFill(Color.YELLOW);break;
+            case 3: controller.getCircle4().setFill(Color.YELLOW);break;
+            case 4: controller.getCircle5().setFill(Color.YELLOW);break;
         }
         myState = State.hungry;
         startHungry.getTime();
@@ -157,5 +187,40 @@ public class Philosopher implements Runnable{
     public int getId() {
         return id;
     }
+
+/*
+    switch(id){
+        case 1: controller.getCircle1().setFill(Color.GREEN);
+            controller.getChopstick1().setFill(Color.WHITESMOKE);
+            controller.getLabel1Chopstick().setText("Used by 1");
+            controller.getChopstick5().setFill(Color.WHITESMOKE);
+            controller.getLabel5Chopstick().setText("Used by 1");
+            ;break;
+        case 2: controller.getCircle2().setFill(Color.GREEN);
+            controller.getChopstick1().setFill(Color.WHITESMOKE);
+            controller.getLabel1Chopstick().setText("Used by 2");
+            controller.getChopstick2().setFill(Color.WHITESMOKE);
+            controller.getLabel2Chopstick().setText("Used by 2");
+            ;break;
+        case 3: controller.getCircle3().setFill(Color.GREEN);
+            controller.getChopstick2().setFill(Color.WHITESMOKE);
+            controller.getLabel2Chopstick().setText("Used by 3");
+            controller.getChopstick3().setFill(Color.WHITESMOKE);
+            controller.getLabel3Chopstick().setText("Used by 3");
+            ;break;
+        case 4: controller.getCircle4().setFill(Color.GREEN);
+            controller.getChopstick3().setFill(Color.WHITESMOKE);
+            controller.getLabel3Chopstick().setText("Used by 4");
+            controller.getChopstick4().setFill(Color.WHITESMOKE);
+            controller.getLabel4Chopstick().setText("Used by 4");
+            ;break;
+        case 5: controller.getCircle5().setFill(Color.GREEN);
+            controller.getChopstick4().setFill(Color.WHITESMOKE);
+            controller.getLabel4Chopstick().setText("Used by 5");
+            controller.getChopstick5().setFill(Color.WHITESMOKE);
+            controller.getLabel5Chopstick().setText("Used by 5");
+            ;break;
+
+    }*/
 
 }
