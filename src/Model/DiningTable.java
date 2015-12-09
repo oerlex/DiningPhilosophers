@@ -2,12 +2,6 @@ package Model;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import sample.Controller;
-import sample.TableData;
-
-import java.util.Queue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by oerlex on 2015-11-27.
@@ -18,21 +12,22 @@ public class DiningTable implements Runnable {
     private Philosopher[] philosophers = new Philosopher[MAX_PHILOSOPHERS];
     public ObservableList<TableData> tableData = FXCollections.observableArrayList();
     private Controller controller;
-    private StringBuilder sb = new StringBuilder();
+    private StringBuilder stringBuilder = new StringBuilder();
     private Thread[] philosophersThreads = new Thread[MAX_PHILOSOPHERS];
+    private Chopstick[] chopsticks;
 
 
     public DiningTable(Controller c){
         this.controller = c;
-        // Model each chopstick with a lock
-        Lock[] chopsticks = new ReentrantLock[MAX_PHILOSOPHERS];
+        chopsticks = new Chopstick[MAX_PHILOSOPHERS];
 
         for (int i = 0; i < MAX_PHILOSOPHERS; i++) {
-            chopsticks[i] = new ReentrantLock();
+            chopsticks[i] = new Chopstick();
+            chopsticks[i].setId(i);
         }
 
         for (int i = 0; i < MAX_PHILOSOPHERS; i++) {
-            philosophers[i] = new Philosopher(i, chopsticks[i], chopsticks[(i+1)%MAX_PHILOSOPHERS], controller, sb);
+            philosophers[i] = new Philosopher(i, chopsticks[i], chopsticks[(i+1)%MAX_PHILOSOPHERS], controller, stringBuilder);
             philosophersThreads[i] = new Thread(philosophers[i]);
             philosophersThreads[i].start();
             TableData td = new TableData();
@@ -41,6 +36,7 @@ public class DiningTable implements Runnable {
             td.setAverageHungry(philosophers[i].getAverageHungry());
             tableData.add(td);
         }
+        System.out.println("Initialization finished");
     }
 
 
@@ -48,7 +44,7 @@ public class DiningTable implements Runnable {
     public void run() {
         while(true){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
                 for(int i=0;i<=MAX_PHILOSOPHERS-1;i++){
                     tableData.get(i).setAverageThinking(philosophers[i].getAverageThinking());
                     tableData.get(i).setAverageEating(philosophers[i].getAverageEating());
@@ -64,7 +60,9 @@ public class DiningTable implements Runnable {
         return philosophersThreads;
     }
 
-    public StringBuilder getSb() {
-        return sb;
+    public StringBuilder getStringBuilder() {
+        return stringBuilder;
     }
+
+    public Philosopher[] getPhilosophers() { return philosophers; }
 }
